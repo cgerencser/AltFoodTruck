@@ -5,6 +5,8 @@ public class PlateCheck : MonoBehaviour {
 
 	[SerializeField] private MiniGameManager gameManager;
 
+	public Controller control;
+
 	// Use this for initialization
 	void Start () {
 	

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class Controller : MonoBehaviour
 {
@@ -16,8 +17,12 @@ public class Controller : MonoBehaviour
 	private GameObject controls;
 	[SerializeField]
 	private GameObject end;
+	[SerializeField]
+	private GameObject droppedFood;
     private bool timeOn;
-    private bool exit;
+	public Text timerText;
+	private float timeLeft = 120.0f;
+
     // Use this for initialization
     void Start()
     {
@@ -27,8 +32,8 @@ public class Controller : MonoBehaviour
 		controls.SetActive (false);
 		end.SetActive (false);
 		pause.SetActive (false);
+		droppedFood.SetActive (false);
         timeOn = true;
-        exit = false;
     }
 
 	public void ControlMenu(){
@@ -41,10 +46,27 @@ public class Controller : MonoBehaviour
 		quit.SetActive (true);
 	}
 
+	public void DroppedFood(){
+		menu.SetActive (false);
+		instructions.SetActive (false);
+		StartCoroutine (dFood ());
+
+	}
+
+	IEnumerator dFood(){
+		
+		droppedFood.SetActive (true);
+		yield return new WaitForSeconds (3);
+		droppedFood.SetActive (false);
+		menu.SetActive (true);
+		instructions.SetActive (true);
+	}
+
 	public void Continue(){
 		timeOn = !timeOn;
 		Time.timeScale = 1;
 		menu.SetActive (true);
+		instructions.SetActive (true);
 		pause.SetActive (false);
 		Cursor.visible = false;
 	}
@@ -55,7 +77,20 @@ public class Controller : MonoBehaviour
 	}
 		
 	public void QuitYes(){
+		quit.SetActive (false);
+		EndScene ();
+	}
 
+	public void EndScene(){
+		Cursor.visible = true;
+		Time.timeScale = 0;
+		end.SetActive (true);
+		menu.SetActive (false);
+		instructions.SetActive (false);
+	}
+
+	public void EndSceneContinue(){
+		SceneManager.LoadScene ("StartScene");
 	}
 
 	public void ControlsBack(){
@@ -65,6 +100,12 @@ public class Controller : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+		timeLeft -= Time.deltaTime;
+		timerText.text = Mathf.RoundToInt(timeLeft).ToString();
+		if (timeLeft < 0) {
+			EndScene ();
+		}
+
 		if (timeOn) {
 			if (Input.GetKeyDown ("p")) {
 				timeOn = !timeOn;
@@ -79,6 +120,7 @@ public class Controller : MonoBehaviour
 				timeOn = !timeOn;
 				Time.timeScale = 1;
 				menu.SetActive (true);
+				instructions.SetActive (true);
 				pause.SetActive (false);
 				Cursor.visible = false;
 			}
